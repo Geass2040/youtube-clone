@@ -18,7 +18,7 @@ export function CategoryPills({
   const [translate, setTranslate] = useState(500);
   const [isLeftVisible, setIsLeftVisible] = useState(true);
   const [isRightVisible, setIsRightVisible] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -31,6 +31,7 @@ export function CategoryPills({
       );
     });
 
+    //@ts-expect-error because some times containerRef is null
     observer.observe(containerRef.current);
 
     return () => {
@@ -39,6 +40,7 @@ export function CategoryPills({
   }, [translate, containerRef]);
 
   return (
+    //@ts-expect-error because some times containerRef is null
     <div ref={containerRef} className="overflow-x-hidden relative">
       <div
         className="flex whitespace-nowrap gap-3 transition-transform w-[max-content]"
@@ -85,7 +87,12 @@ export function CategoryPills({
                 const newTranslate = translate + TRANSLATE_AMOUNT;
                 const edge = containerRef.current?.scrollWidth;
                 const width = containerRef.current?.clientWidth;
-                if (newTranslate + width >= edge) return edge - width + 48;
+                if (
+                  width !== undefined &&
+                  edge !== undefined &&
+                  newTranslate + width >= edge
+                )
+                  return edge - width + 48;
                 return newTranslate;
               });
             }}
